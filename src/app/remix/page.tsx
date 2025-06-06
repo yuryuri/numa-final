@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { 
   PlayIcon,
@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useAudioStore } from "@/store/audioStore";
 import WaveformVisualizer from '../components/WaveformVisualizer';
 
-export default function RemixPage() {
+function RemixPageContent() {
   const searchParams = useSearchParams();
   const ytUrl = searchParams.get("url") || "";
   const [audioError, setAudioError] = useState<string | null>(null);
@@ -387,5 +387,20 @@ export default function RemixPage() {
         </>
       )}
     </main>
+  );
+}
+
+export default function RemixPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="animate-spin">
+          <ArrowPathIcon className="w-10 h-10 text-indigo-500" />
+        </div>
+        <p className="mt-4 text-gray-400">Loading...</p>
+      </div>
+    }>
+      <RemixPageContent />
+    </Suspense>
   );
 }
