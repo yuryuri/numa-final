@@ -9,7 +9,6 @@ import {
   SpeakerXMarkIcon,
   ArrowPathIcon,
   ChevronLeftIcon,
-  MusicalNoteIcon,
   ExclamationCircleIcon,
   ArrowDownTrayIcon
 } from "@heroicons/react/24/solid";
@@ -32,7 +31,6 @@ export default function RemixPage() {
     error,
     stems,
     currentTime,
-    setPlaying,
     toggleStem,
     adjustStemVolume,
     processYoutubeUrl,
@@ -41,8 +39,7 @@ export default function RemixPage() {
     seekTo
   } = useAudioStore();
   
-  // Refs
-  const waveformRef = useRef<HTMLDivElement>(null);
+  // Removed unused ref
   
   // Process YouTube URL on component mount
   useEffect(() => {
@@ -99,11 +96,11 @@ export default function RemixPage() {
   useEffect(() => {
     if (selectedStem && isPlaying) {
       // Get audio elements
-      const audioElements = (window as any).audioElements;
+      const audioElements = (window as unknown as { audioElements?: Record<string, HTMLAudioElement> }).audioElements;
       if (!audioElements) return;
       
       // Synchronize all other stems to the currentTime
-      Object.entries(audioElements).forEach(([stemId, audio]: [string, any]) => {
+      Object.entries(audioElements).forEach(([stemId, audio]: [string, HTMLAudioElement]) => {
         if (stemId !== selectedStem && audio instanceof HTMLAudioElement) {
           // Only adjust if the difference is significant (>100ms)
           if (Math.abs(audio.currentTime - currentTime) > 0.1) {
@@ -172,10 +169,11 @@ export default function RemixPage() {
   const stemsLoading = stems.some(stem => !stem.loaded);
   const allStemsLoaded = stems.length > 0 && stems.every(stem => stem.loaded);
   
-  // Toggle specific stem playback
+  // Toggle specific stem playback (currently unused but kept for future functionality)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const toggleStemMute = (stemId: string) => {
     // Get audio elements
-    const audioElements = (window as any).audioElements;
+    const audioElements = (window as unknown as { audioElements?: Record<string, HTMLAudioElement> }).audioElements;
     if (!audioElements) return;
 
     const audio = audioElements[stemId];
@@ -187,16 +185,11 @@ export default function RemixPage() {
     if (!stem) return;
 
     // Use the gainNodes to effectively mute/unmute this stem
-    const gainNodes = (window as any).gainNodes;
+    const gainNodes = (window as unknown as { gainNodes?: Record<string, GainNode> }).gainNodes;
     if (!gainNodes || !gainNodes[stemId]) return;
 
-    // Toggle active state for this specific stem
-    const updatedStems = stems.map(s => 
-      s.id === stemId ? { ...s, active: !s.active } : s
-    );
-
     // Apply the change to the gain node
-    const audioContext = (window as any).audioContext;
+    const audioContext = (window as unknown as { audioContext?: AudioContext }).audioContext;
     const gainNode = gainNodes[stemId];
     const now = audioContext?.currentTime || 0;
 
@@ -345,7 +338,6 @@ export default function RemixPage() {
                 </div>
                 <WaveformVisualizer
                   audioUrl={stem.url}
-                  isPlaying={isPlaying && stem.active}
                   onTimeUpdate={(time) => handleTimeUpdate(time, stem.id)}
                   color={stem.id === 'vocals' ? '#ef4444' : 
                          stem.id === 'drums' ? '#22c55e' :

@@ -4,7 +4,6 @@ import { useAudioStore } from '@/store/audioStore';
 
 interface WaveformVisualizerProps {
   audioUrl: string;
-  isPlaying: boolean;
   onTimeUpdate: (time: number) => void;
   color?: string;
   stemId: string;
@@ -12,7 +11,6 @@ interface WaveformVisualizerProps {
 
 export default function WaveformVisualizer({
   audioUrl,
-  isPlaying,
   onTimeUpdate,
   color = '#6366f1',
   stemId,
@@ -139,7 +137,8 @@ export default function WaveformVisualizer({
         setLoadError(false);
       });
       
-      wavesurfer.on('error' as any, (err) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      wavesurfer.on('error' as any, (err: Error) => {
         console.error(`Wavesurfer error for ${stemId}:`, err);
         
         // Try to recover with retry
@@ -270,7 +269,7 @@ export default function WaveformVisualizer({
         abortControllerRef.current = null;
       }
     };
-  }, [audioUrl, color, stemId, retryCount, loadError, attemptedFetch]);
+  }, [audioUrl, color, stemId, retryCount, loadError, attemptedFetch, isReady, onTimeUpdate, seekTo]);
 
   // Function to retry loading if it failed
   const handleRetry = () => {
@@ -305,20 +304,7 @@ export default function WaveformVisualizer({
     }
   }, [isReady]);
 
-  // Add volume control logic
-  const handleVolumeChange = (volume: number) => {
-    if (wavesurferRef.current) {
-      wavesurferRef.current.setVolume(volume);
-    }
-  };
-
-  // Fix mute button to only silence the stem
-  const handleMuteToggle = () => {
-    if (wavesurferRef.current) {
-      const currentVolume = wavesurferRef.current.getVolume();
-      wavesurferRef.current.setVolume(currentVolume > 0 ? 0 : 1);
-    }
-  };
+  // Volume control functions removed as they were unused
 
   return (
     <div className="w-full bg-gray-900 rounded-lg p-2 relative">

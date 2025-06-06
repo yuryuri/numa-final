@@ -17,7 +17,13 @@ if (!fs.existsSync(DOWNLOAD_DIR)) {
 }
 
 // Add cache to prevent re-processing the same URL
-const processedVideos = new Map<string, any>();
+interface ProcessedVideo {
+  videoId: string;
+  title: string;
+  masterAudio: string;
+  stems: Record<string, string>;
+}
+const processedVideos = new Map<string, ProcessedVideo>();
 
 export async function GET(request: NextRequest) {
   // Get YouTube URL from query params

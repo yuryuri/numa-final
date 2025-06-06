@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowDownTrayIcon } from "@heroicons/react/24/solid";
+// Removed unused import
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -64,7 +64,7 @@ export default function Home() {
               <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center">2</div>
               <div>
                 <h3 className="font-medium">AI Audio Separation</h3>
-                <p className="text-gray-400 text-sm">We'll split the track into vocals, drums, bass, and other elements</p>
+                <p className="text-gray-400 text-sm">We&apos;ll split the track into vocals, drums, bass, and other elements</p>
               </div>
             </li>
             <li className="flex gap-3">

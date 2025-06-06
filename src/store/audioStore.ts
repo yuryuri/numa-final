@@ -108,13 +108,14 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   setStems: (stems) => set({ stems }),
   
   seekTo: (time) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { stems } = get();
-    const audioElements = (window as any).audioElements;
+    const audioElements = (window as unknown as { audioElements?: Record<string, HTMLAudioElement> }).audioElements;
     
     if (!audioElements) return;
     
     // Update all audio elements to the new time
-    Object.entries(audioElements).forEach(([stemId, audio]: [string, any]) => {
+    Object.entries(audioElements).forEach(([stemId, audio]: [string, HTMLAudioElement]) => {
       if (audio instanceof HTMLAudioElement) {
         audio.currentTime = time;
       }
@@ -129,9 +130,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     
     if (!isPlaying) {
       // Get audio elements for each stem
-      const audioElements = (window as any).audioElements;
-      const audioContext = (window as any).audioContext;
-      const gainNodes = (window as any).gainNodes;
+      const audioElements = (window as unknown as { audioElements?: Record<string, HTMLAudioElement> }).audioElements;
+      const audioContext = (window as unknown as { audioContext?: AudioContext }).audioContext;
+      const gainNodes = (window as unknown as { gainNodes?: Record<string, GainNode> }).gainNodes;
       
       if (!audioElements || !audioContext || !gainNodes) return;
       
@@ -162,7 +163,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       };
       
       // Start playback and time tracking
-      Object.entries(audioElements).forEach(([stemId, audio]: [string, any]) => {
+      Object.entries(audioElements).forEach(([, audio]: [string, HTMLAudioElement]) => {
         if (audio instanceof HTMLAudioElement) {
           audio.currentTime = currentTime; // Ensure we start from the current time
         }
@@ -190,10 +191,10 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const { isPlaying } = get();
     
     if (isPlaying) {
-      const audioElements = (window as any).audioElements;
+      const audioElements = (window as unknown as { audioElements?: Record<string, HTMLAudioElement> }).audioElements;
       if (!audioElements) return;
       
-      Object.values(audioElements).forEach((audio: unknown) => {
+      Object.values(audioElements).forEach((audio: HTMLAudioElement) => {
         if (audio instanceof HTMLAudioElement) {
           audio.pause();
         }
@@ -207,8 +208,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const { stems } = get();
 
     // Find the gain nodes
-    const gainNodes = (window as any).gainNodes;
-    const audioContext = (window as any).audioContext;
+    const gainNodes = (window as unknown as { gainNodes?: Record<string, GainNode> }).gainNodes;
+    const audioContext = (window as unknown as { audioContext?: AudioContext }).audioContext;
 
     if (!gainNodes || !audioContext) return;
 
@@ -240,9 +241,9 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     const { stems } = get();
     
     // Find the gain nodes
-    const gainNodes = (window as any).gainNodes;
-    const audioElements = (window as any).audioElements;
-    const audioContext = (window as any).audioContext;
+    const gainNodes = (window as unknown as { gainNodes?: Record<string, GainNode> }).gainNodes;
+    const audioElements = (window as unknown as { audioElements?: Record<string, HTMLAudioElement> }).audioElements;
+    const audioContext = (window as unknown as { audioContext?: AudioContext }).audioContext;
     
     if (!gainNodes || !audioElements || !audioContext) return;
     
@@ -272,6 +273,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   },
   
   processYoutubeUrl: async (url) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const store = get();
     
     // Reset state and clear any previous audio
@@ -282,16 +284,23 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     }
     
     // Clean up previous audio context if it exists
-    if ((window as any).audioContext) {
+    const windowWithAudio = window as unknown as {
+      audioContext?: AudioContext;
+      gainNodes?: Record<string, GainNode>;
+      audioElements?: Record<string, HTMLAudioElement>;
+      mediaElementSources?: Record<string, MediaElementAudioSourceNode>;
+    };
+    
+    if (windowWithAudio.audioContext) {
       try {
-        await (window as any).audioContext.close();
+        await windowWithAudio.audioContext.close();
       } catch (e) {
         console.error("Error closing audio context:", e);
       }
-      (window as any).audioContext = null;
-      (window as any).gainNodes = null;
-      (window as any).audioElements = null;
-      (window as any).mediaElementSources = null;
+      windowWithAudio.audioContext = undefined;
+      windowWithAudio.gainNodes = undefined;
+      windowWithAudio.audioElements = undefined;
+      windowWithAudio.mediaElementSources = undefined;
     }
     
     set({ 
@@ -452,7 +461,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
             const errorText = await response.text();
             const errorJson = JSON.parse(errorText);
             errorDetails = errorJson.error || '';
-          } catch (e) {
+          } catch {
             // Failed to parse the error, use status text
             errorDetails = response.statusText || 'Unknown error';
           }
@@ -534,11 +543,11 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 async function setupWebAudioForStems(masterUrl: string, stems: Stem[]) {
   try {
     // Create audio context
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+    const AudioContext = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof window.AudioContext }).webkitAudioContext;
     const audioContext = new AudioContext();
     
     // Store the audio context globally so we can access it later
-    (window as any).audioContext = audioContext;
+    (window as unknown as { audioContext?: AudioContext }).audioContext = audioContext;
     
     // Create separate audio elements and gain nodes for each stem
     const gainNodes: Record<string, GainNode> = {};
@@ -577,8 +586,8 @@ async function setupWebAudioForStems(masterUrl: string, stems: Stem[]) {
       potentialFallbackMode = uniqueUrls.size < stems.length;
       
       console.log(`Potential fallback mode detected: ${potentialFallbackMode}`);
-    } catch (e) {
-      console.error('Error checking for fallback mode:', e);
+    } catch (error) {
+      console.error('Error checking for fallback mode:', error);
     }
     
     // Load each stem with its own audio element and source
@@ -755,11 +764,19 @@ async function setupWebAudioForStems(masterUrl: string, stems: Stem[]) {
     });
     
     // Store nodes globally
-    (window as any).gainNodes = gainNodes;
-    (window as any).audioElements = audioElements;
-    (window as any).mediaElementSources = mediaElementSources;
-    (window as any).filters = filters;
-    (window as any).fallbackMode = potentialFallbackMode;
+    const windowWithAudio = window as unknown as {
+      gainNodes?: Record<string, GainNode>;
+      audioElements?: Record<string, HTMLAudioElement>;
+      mediaElementSources?: Record<string, MediaElementAudioSourceNode>;
+      filters?: Record<string, BiquadFilterNode | null>;
+      fallbackMode?: boolean;
+    };
+    
+    windowWithAudio.gainNodes = gainNodes;
+    windowWithAudio.audioElements = audioElements;
+    windowWithAudio.mediaElementSources = mediaElementSources;
+    windowWithAudio.filters = filters;
+    windowWithAudio.fallbackMode = potentialFallbackMode;
     
     // Mark all stems as loaded
     const updatedStems = stems.map(stem => ({
