@@ -61,6 +61,8 @@ Numa is a web application that allows users to separate YouTube songs into indiv
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+<!-- Deployment trigger -->
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
