@@ -11,11 +11,16 @@ const fileCache = new Map<string, Buffer>();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { videoId: string; stem: string } }
+  context: {
+    params: {
+      videoId: string;
+      stem: string;
+    };
+  }
 ) {
   try {
-    // Extract params from the destructured context
-    const { videoId, stem } = params;
+    // Extract params from the context object
+    const { videoId, stem } = context.params;
     
     // Create a cache key for this request
     const cacheKey = `${videoId}:${stem}`;
