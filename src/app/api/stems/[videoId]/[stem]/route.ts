@@ -11,11 +11,11 @@ const fileCache = new Map<string, Buffer>();
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { videoId: string; stem: string } }
+  context: { params: Promise<{ videoId: string; stem: string }> }
 ) {
   try {
-    // Extract params directly from destructured argument
-    const { videoId, stem } = params;
+    // In Next.js 15, params is a Promise that needs to be awaited
+    const { videoId, stem } = await context.params;
     
     // Create a cache key for this request
     const cacheKey = `${videoId}:${stem}`;
