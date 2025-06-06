@@ -115,7 +115,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     if (!audioElements) return;
     
     // Update all audio elements to the new time
-    Object.entries(audioElements).forEach(([stemId, audio]: [string, HTMLAudioElement]) => {
+    Object.entries(audioElements).forEach(([, audio]: [string, HTMLAudioElement]) => {
       if (audio instanceof HTMLAudioElement) {
         audio.currentTime = time;
       }
