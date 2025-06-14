@@ -462,9 +462,11 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
             const errorJson = JSON.parse(errorText);
             errorDetails = errorJson.error || '';
             
-            // Check if this is a Vercel deployment issue
-            if (response.status === 501 || errorDetails.includes('system dependencies')) {
-              throw new Error('This app requires local setup with Python dependencies (yt-dlp, demucs). Vercel deployment cannot process YouTube videos. Please run locally with "npm run dev".');
+            // Check for specific error types
+            if (response.status === 500 && errorDetails.includes('Fadr API key')) {
+              throw new Error('Fadr API key not configured. Please add your Fadr API key to process YouTube videos. Get one at https://fadr.com/plus');
+            } else if (response.status === 501 || errorDetails.includes('system dependencies')) {
+              throw new Error('This app now uses Fadr API for faster processing. Please configure your Fadr API key.');
             }
           } catch {
             // Failed to parse the error, use status text
@@ -480,12 +482,27 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       
       console.log('API response:', data);
       
-      // Extract data from response
-      const { videoId, title, stems: stemUrls, usedFallback } = data;
+      // Extract data from response (new Fadr format)
+      const { videoId, stemPaths, metadata } = data;
+      
+      // Handle both old and new API formats
+      const stemUrls = stemPaths || data.stems;
+      const title = data.songTitle || data.title || 'Unknown Song';
+      const usedFallback = data.usedFallback || 'false';
       
       // Check that all stem URLs exist
       if (!stemUrls || !stemUrls.vocals || !stemUrls.drums || !stemUrls.bass || !stemUrls.other) {
         throw new Error('Incomplete stem data received from server. Please try again with a different video.');
+      }
+      
+      // Log additional metadata from Fadr
+      if (metadata) {
+        console.log('🎵 Fadr processing metadata:', {
+          key: metadata.key,
+          tempo: metadata.tempo,
+          processingTime: metadata.processingTime,
+          provider: metadata.provider
+        });
       }
       
       // Cache the stems data

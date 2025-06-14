@@ -32,7 +32,7 @@ This application requires the following system dependencies to process YouTube v
 2. **yt-dlp** for YouTube audio downloading
 3. **demucs** for AI-powered stem separation
 
-### Local Setup
+### Quick Setup (Recommended - Fadr API)
 
 1. Clone the repository:
    ```bash
@@ -45,32 +45,48 @@ This application requires the following system dependencies to process YouTube v
    npm install
    ```
 
-3. Set up Python environment:
-   ```bash
-   # Create virtual environment
-   python3 -m venv numa-env
-   
-   # Activate virtual environment
-   source numa-env/bin/activate  # On Windows: numa-env\Scripts\activate
-   
-   # Install Python dependencies
-   pip install yt-dlp demucs torch torchaudio
-   ```
+3. Get a Fadr API key:
+   - Visit [fadr.com/plus](https://fadr.com/plus)
+   - Subscribe to Fadr Plus ($10/month)
+   - Get your API key from your account dashboard
 
-4. Update the demucs path in the code (if needed):
-   Edit `src/app/api/youtube/route.ts` and update the `demucsPath` variable to match your installation.
+4. Set up environment variables:
+   ```bash
+   # Create .env.local file
+   echo "FADR_API_KEY=your_fadr_api_key_here" > .env.local
+   ```
 
 5. Run the development server:
    ```bash
    npm run dev
    ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+6. Open [http://localhost:3000](http://localhost:3000) to use the app
+
+### ✅ Benefits of Fadr Integration
+
+- **Works on Vercel**: No Python dependencies needed
+- **Super Fast**: ~30 seconds vs 3+ minutes locally  
+- **Better Quality**: Professional AI models
+- **More Features**: 16 stem types, MIDI export, key/tempo detection
+- **Cost Effective**: $0.05 per minute vs expensive server costs
+
+### Legacy Setup (Local Processing)
+
+If you prefer to run processing locally (not recommended):
+
+1. Install Python dependencies:
+   ```bash
+   pip install yt-dlp demucs torch torchaudio
+   ```
+
+2. Revert the API to use local demucs processing
+
+⚠️ **Note**: Local processing requires powerful hardware and takes 3+ minutes per track
 
 ### Deployment Notes
 
-⚠️ **This application cannot run on Vercel** due to system dependency requirements. For production deployment, consider:
-- AWS EC2 with proper Python environment setup
+✅ **This application can now run on Vercel** with Fadr API integration! Deploy directly by:
 - Google Cloud Run with custom container
 - DigitalOcean Droplets
 - Any VPS with Python/pip access

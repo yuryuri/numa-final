@@ -25,28 +25,29 @@ export default function Home() {
           Remix YouTube audio on your mobile device
         </p>
         
-        {/* Add deployment notice */}
-        {process.env.VERCEL && (
-          <div className="bg-amber-900/20 border border-amber-500/30 rounded-lg p-4 mb-6">
-            <div className="flex items-start gap-3">
-              <div className="text-amber-500 mt-0.5">⚠️</div>
-              <div className="text-sm">
-                <p className="font-medium text-amber-400 mb-1">Demo Deployment Notice</p>
-                <p className="text-amber-200/90">
-                  This Vercel deployment is for preview only. YouTube processing requires local setup with Python dependencies. 
-                  <a 
-                    href="https://github.com/yuryuri/numa-final#getting-started" 
-                    className="text-amber-300 hover:text-amber-100 underline ml-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    See setup guide →
-                  </a>
-                </p>
-              </div>
+        {/* Fadr API integration notice */}
+        <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <div className="text-blue-400 mt-0.5">🚀</div>
+            <div className="text-sm">
+              <p className="font-medium text-blue-300 mb-1">Now Powered by Fadr AI</p>
+              <p className="text-blue-200/90 mb-2">
+                Super-fast stem separation in ~30 seconds using professional AI models.
+              </p>
+              <p className="text-blue-200/90">
+                <strong>Setup required:</strong> Add your Fadr API key to environment variables. 
+                <a 
+                  href="https://fadr.com/plus" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-blue-300 hover:text-blue-100 underline ml-1"
+                >
+                  Get API access ($10/month) →
+                </a>
+              </p>
             </div>
           </div>
-        )}
+        </div>
       </div>
 
       <div className="relative w-full max-w-lg flex flex-col items-center">

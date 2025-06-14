@@ -234,13 +234,22 @@ function RemixPageContent() {
           <h2 className="text-xl font-bold mb-2">Processing Error</h2>
           <p className="text-red-400 mb-4 text-sm leading-relaxed">{error}</p>
           
-          {error.includes('system dependencies') || error.includes('Vercel') ? (
+          {error.includes('Fadr API key') ? (
             <div className="bg-gray-800 p-4 rounded-lg mb-4 text-left text-sm">
-              <h3 className="font-semibold mb-2">🛠️ Local Setup Required:</h3>
+              <h3 className="font-semibold mb-2">🔑 Fadr API Setup Required:</h3>
               <ol className="list-decimal list-inside space-y-1 text-gray-300">
-                <li>Clone the repo locally</li>
-                <li>Install Python dependencies: <code className="bg-gray-700 px-1 rounded">pip install yt-dlp demucs</code></li>
-                <li>Run <code className="bg-gray-700 px-1 rounded">npm run dev</code></li>
+                <li>Get API key at <a href="https://fadr.com/plus" target="_blank" rel="noopener" className="text-blue-400 underline">fadr.com/plus</a></li>
+                <li>Add <code className="bg-gray-700 px-1 rounded">FADR_API_KEY=your_key</code> to .env.local</li>
+                <li>Restart your development server</li>
+              </ol>
+            </div>
+          ) : error.includes('system dependencies') || error.includes('Vercel') ? (
+            <div className="bg-gray-800 p-4 rounded-lg mb-4 text-left text-sm">
+              <h3 className="font-semibold mb-2">🚀 Upgrade to Fadr API:</h3>
+              <ol className="list-decimal list-inside space-y-1 text-gray-300">
+                <li>Get API key at <a href="https://fadr.com/plus" target="_blank" rel="noopener" className="text-blue-400 underline">fadr.com/plus</a></li>
+                <li>Much faster processing (~30 seconds)</li>
+                <li>Works on Vercel deployment</li>
               </ol>
             </div>
           ) : null}
