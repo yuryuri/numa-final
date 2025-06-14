@@ -229,13 +229,39 @@ function RemixPageContent() {
   if (error && !isProcessing) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <p className="text-xl text-red-500 mb-4">Error: {error}</p>
-        <Link 
-          href="/"
-          className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg text-white"
-        >
-          Try again
-        </Link>
+        <div className="max-w-md text-center">
+          <ExclamationCircleIcon className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-xl font-bold mb-2">Processing Error</h2>
+          <p className="text-red-400 mb-4 text-sm leading-relaxed">{error}</p>
+          
+          {error.includes('system dependencies') || error.includes('Vercel') ? (
+            <div className="bg-gray-800 p-4 rounded-lg mb-4 text-left text-sm">
+              <h3 className="font-semibold mb-2">🛠️ Local Setup Required:</h3>
+              <ol className="list-decimal list-inside space-y-1 text-gray-300">
+                <li>Clone the repo locally</li>
+                <li>Install Python dependencies: <code className="bg-gray-700 px-1 rounded">pip install yt-dlp demucs</code></li>
+                <li>Run <code className="bg-gray-700 px-1 rounded">npm run dev</code></li>
+              </ol>
+            </div>
+          ) : null}
+          
+          <div className="flex gap-2 justify-center">
+            <Link 
+              href="/"
+              className="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg text-white text-sm"
+            >
+              Try Again
+            </Link>
+            <a 
+              href="https://github.com/yuryuri/numa-final#getting-started"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-white text-sm"
+            >
+              Setup Guide
+            </a>
+          </div>
+        </div>
       </div>
     );
   }

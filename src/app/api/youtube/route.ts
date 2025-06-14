@@ -26,6 +26,16 @@ interface ProcessedVideo {
 const processedVideos = new Map<string, ProcessedVideo>();
 
 export async function GET(request: NextRequest) {
+  // Check if we're running on Vercel - this processing won't work there
+  if (process.env.VERCEL) {
+    return NextResponse.json(
+      { 
+        error: 'YouTube processing is not available on Vercel due to system dependencies. Please run locally or use a different hosting platform that supports Python and system binaries.' 
+      },
+      { status: 501 }
+    );
+  }
+
   // Get YouTube URL from query params
   const searchParams = request.nextUrl.searchParams;
   const youtubeUrl = searchParams.get('url');

@@ -461,6 +461,11 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
             const errorText = await response.text();
             const errorJson = JSON.parse(errorText);
             errorDetails = errorJson.error || '';
+            
+            // Check if this is a Vercel deployment issue
+            if (response.status === 501 || errorDetails.includes('system dependencies')) {
+              throw new Error('This app requires local setup with Python dependencies (yt-dlp, demucs). Vercel deployment cannot process YouTube videos. Please run locally with "npm run dev".');
+            }
           } catch {
             // Failed to parse the error, use status text
             errorDetails = response.statusText || 'Unknown error';
